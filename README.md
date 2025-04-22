@@ -134,14 +134,26 @@ List all campaigns with optional filtering.
 
 ### smartlead_save_campaign_sequence
 
-Save a sequence of emails for a campaign.
+Save a sequence of emails for a campaign with A/B testing variants.
 
 **Parameters:**
 - `campaign_id` (required): ID of the campaign
-- `sequence` (required): Array of email sequence items, each with:
-  - `subject` (required): Email subject line
-  - `body` (required): Email body content
-  - `wait_days`: Days to wait before sending this email
+- `sequences` (required): Array of email sequence items, each with:
+  - `id`: ID of the sequence (only for updates, omit when creating)
+  - `seq_number` (required): Sequence number (order in the sequence)
+  - `seq_delay_details` (required): Delay settings with:
+    - `delay_in_days` (required): Days to wait before sending this email
+  - `variant_distribution_type`: Type of variant distribution (MANUAL_EQUAL, MANUAL_PERCENTAGE, AI_EQUAL)
+  - `lead_distribution_percentage`: Sample percentage size of the lead pool to use to find the winner
+  - `winning_metric_property`: Metric to use for determining the winning variant (OPEN_RATE, CLICK_RATE, REPLY_RATE, POSITIVE_REPLY_RATE)
+  - `seq_variants`: Array of email variants, each with:
+    - `subject` (required): Email subject line
+    - `email_body` (required): Email body content (HTML)
+    - `variant_label` (required): Label for the variant (e.g., "A", "B", "C")
+    - `id`: ID of the variant (only for updates, omit when creating)
+    - `variant_distribution_percentage`: Percentage of leads to receive this variant
+  - `subject`: Email subject line (for simple follow-ups, blank makes it in the same thread)
+  - `email_body`: Email body content (HTML) for simple follow-ups
 
 ### smartlead_get_campaign_sequence
 
@@ -196,16 +208,26 @@ Remove an email account from a campaign.
 
 ### smartlead_add_lead_to_campaign
 
-Add a lead to a campaign.
+Add leads to a campaign (up to 100 leads at once).
 
 **Parameters:**
 - `campaign_id` (required): ID of the campaign
-- `lead` (required): Lead information with:
+- `lead_list` (required): Array of lead information objects (max 100), each with:
   - `email` (required): Email address of the lead
   - `first_name`: First name of the lead
   - `last_name`: Last name of the lead
-  - `company`: Company of the lead
-  - `custom_variables`: Custom variables for the lead
+  - `company_name`: Company name of the lead
+  - `phone_number`: Phone number of the lead
+  - `website`: Website of the lead
+  - `location`: Location of the lead
+  - `custom_fields`: Custom fields for the lead (max 20 fields)
+  - `linkedin_profile`: LinkedIn profile URL of the lead
+  - `company_url`: Company URL of the lead
+- `settings`: Settings for lead addition:
+  - `ignore_global_block_list`: If true, uploaded leads will bypass the global block list
+  - `ignore_unsubscribe_list`: If true, leads will bypass the comparison with unsubscribed leads
+  - `ignore_community_bounce_list`: If true, uploaded leads will bypass any leads that bounced across the entire userbase
+  - `ignore_duplicate_leads_in_other_campaign`: If true, leads will NOT bypass the comparison with other campaigns
 
 ### smartlead_update_lead_in_campaign
 

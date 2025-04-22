@@ -148,7 +148,7 @@ const LIST_CAMPAIGNS_TOOL: Tool = {
 // Campaign sequence tools
 const SAVE_CAMPAIGN_SEQUENCE_TOOL: Tool = {
   name: 'smartlead_save_campaign_sequence',
-  description: 'Save a sequence of emails for a campaign.',
+  description: 'Save a sequence of emails for a campaign with A/B testing variants.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -156,30 +156,91 @@ const SAVE_CAMPAIGN_SEQUENCE_TOOL: Tool = {
         type: 'number',
         description: 'ID of the campaign',
       },
-      sequence: {
+      sequences: {
         type: 'array',
         items: {
           type: 'object',
           properties: {
+            id: {
+              type: 'number',
+              description: 'ID of the sequence (only for updates, omit when creating)',
+            },
+            seq_number: {
+              type: 'number',
+              description: 'Sequence number (order in the sequence)',
+            },
+            seq_delay_details: {
+              type: 'object',
+              properties: {
+                delay_in_days: {
+                  type: 'number',
+                  description: 'Days to wait before sending this email',
+                },
+              },
+              required: ['delay_in_days'],
+              description: 'Delay settings for the sequence',
+            },
+            variant_distribution_type: {
+              type: 'string',
+              enum: ['MANUAL_EQUAL', 'MANUAL_PERCENTAGE', 'AI_EQUAL'],
+              description: 'Type of variant distribution',
+            },
+            lead_distribution_percentage: {
+              type: 'number',
+              description: 'Sample percentage size of the lead pool to use to find the winner',
+            },
+            winning_metric_property: {
+              type: 'string',
+              enum: ['OPEN_RATE', 'CLICK_RATE', 'REPLY_RATE', 'POSITIVE_REPLY_RATE'],
+              description: 'Metric to use for determining the winning variant',
+            },
+            seq_variants: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  subject: {
+                    type: 'string',
+                    description: 'Email subject line',
+                  },
+                  email_body: {
+                    type: 'string',
+                    description: 'Email body content (HTML)',
+                  },
+                  variant_label: {
+                    type: 'string',
+                    description: 'Label for the variant (e.g., "A", "B", "C")',
+                  },
+                  id: {
+                    type: 'number',
+                    description: 'ID of the variant (only for updates, omit when creating)',
+                  },
+                  variant_distribution_percentage: {
+                    type: 'number',
+                    description: 'Percentage of leads to receive this variant',
+                  },
+                },
+                required: ['subject', 'email_body', 'variant_label'],
+                description: 'Email variant information',
+              },
+              description: 'Variants for A/B testing',
+            },
             subject: {
               type: 'string',
-              description: 'Email subject line',
+              description: 'Email subject line (for simple follow-ups, blank makes it in the same thread)',
             },
-            body: {
+            email_body: {
               type: 'string',
-              description: 'Email body content',
-            },
-            wait_days: {
-              type: 'number',
-              description: 'Days to wait before sending this email',
+              description: 'Email body content (HTML) for simple follow-ups',
             },
           },
-          required: ['subject', 'body'],
+          required: ['seq_number', 'seq_delay_details'],
+          description: 'Sequence information',
         },
-        description: 'Sequence of emails to send',
+        description: 'Array of email sequences to send',
       },
     },
-    required: ['campaign_id', 'sequence'],
+    required: ['campaign_id', 'sequences'],
   },
 };
 
@@ -313,7 +374,7 @@ const DELETE_EMAIL_ACCOUNT_FROM_CAMPAIGN_TOOL: Tool = {
 // Lead management tools
 const ADD_LEAD_TO_CAMPAIGN_TOOL: Tool = {
   name: 'smartlead_add_lead_to_campaign',
-  description: 'Add a lead to a campaign.',
+  description: 'Add leads to a campaign (up to 100 leads at once).',
   inputSchema: {
     type: 'object',
     properties: {
@@ -321,35 +382,81 @@ const ADD_LEAD_TO_CAMPAIGN_TOOL: Tool = {
         type: 'number',
         description: 'ID of the campaign',
       },
-      lead: {
+      lead_list: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            email: {
+              type: 'string',
+              description: 'Email address of the lead',
+            },
+            first_name: {
+              type: 'string',
+              description: 'First name of the lead',
+            },
+            last_name: {
+              type: 'string',
+              description: 'Last name of the lead',
+            },
+            company_name: {
+              type: 'string',
+              description: 'Company name of the lead',
+            },
+            phone_number: {
+              type: ['string', 'number'],
+              description: 'Phone number of the lead',
+            },
+            website: {
+              type: 'string',
+              description: 'Website of the lead',
+            },
+            location: {
+              type: 'string',
+              description: 'Location of the lead',
+            },
+            custom_fields: {
+              type: 'object',
+              description: 'Custom fields for the lead (max 20 fields)',
+            },
+            linkedin_profile: {
+              type: 'string',
+              description: 'LinkedIn profile URL of the lead',
+            },
+            company_url: {
+              type: 'string',
+              description: 'Company URL of the lead',
+            },
+          },
+          required: ['email'],
+          description: 'Lead information',
+        },
+        description: 'List of leads to add (max 100)',
+      },
+      settings: {
         type: 'object',
         properties: {
-          email: {
-            type: 'string',
-            description: 'Email address of the lead',
+          ignore_global_block_list: {
+            type: 'boolean',
+            description: 'If true, uploaded leads will bypass the global block list',
           },
-          first_name: {
-            type: 'string',
-            description: 'First name of the lead',
+          ignore_unsubscribe_list: {
+            type: 'boolean',
+            description: 'If true, leads will bypass the comparison with unsubscribed leads',
           },
-          last_name: {
-            type: 'string',
-            description: 'Last name of the lead',
+          ignore_community_bounce_list: {
+            type: 'boolean',
+            description: 'If true, uploaded leads will bypass any leads that bounced across the entire userbase',
           },
-          company: {
-            type: 'string',
-            description: 'Company of the lead',
-          },
-          custom_variables: {
-            type: 'object',
-            description: 'Custom variables for the lead',
+          ignore_duplicate_leads_in_other_campaign: {
+            type: 'boolean',
+            description: 'If true, leads will NOT bypass the comparison with other campaigns',
           },
         },
-        required: ['email'],
-        description: 'Lead information',
+        description: 'Settings for lead addition',
       },
     },
-    required: ['campaign_id', 'lead'],
+    required: ['campaign_id', 'lead_list'],
   },
 };
 
@@ -455,10 +562,24 @@ interface ListCampaignsParams {
 // Campaign sequence types
 interface SaveCampaignSequenceParams {
   campaign_id: number;
-  sequence: Array<{
-    subject: string;
-    body: string;
-    wait_days?: number;
+  sequences: Array<{
+    id?: number;
+    seq_number: number;
+    seq_delay_details: {
+      delay_in_days: number;
+    };
+    variant_distribution_type?: 'MANUAL_EQUAL' | 'MANUAL_PERCENTAGE' | 'AI_EQUAL';
+    lead_distribution_percentage?: number;
+    winning_metric_property?: 'OPEN_RATE' | 'CLICK_RATE' | 'REPLY_RATE' | 'POSITIVE_REPLY_RATE';
+    seq_variants?: Array<{
+      subject: string;
+      email_body: string;
+      variant_label: string;
+      id?: number;
+      variant_distribution_percentage: number;
+    }>;
+    subject?: string;
+    email_body?: string;
   }>;
 }
 
@@ -499,12 +620,23 @@ interface DeleteEmailAccountFromCampaignParams {
 // Lead management types
 interface AddLeadToCampaignParams {
   campaign_id: number;
-  lead: {
+  lead_list: Array<{
     email: string;
     first_name?: string;
     last_name?: string;
-    company?: string;
-    custom_variables?: Record<string, any>;
+    company_name?: string;
+    phone_number?: string | number;
+    website?: string;
+    location?: string;
+    custom_fields?: Record<string, any>;
+    linkedin_profile?: string;
+    company_url?: string;
+  }>;
+  settings?: {
+    ignore_global_block_list?: boolean;
+    ignore_unsubscribe_list?: boolean;
+    ignore_community_bounce_list?: boolean;
+    ignore_duplicate_leads_in_other_campaign?: boolean;
   };
 }
 
@@ -574,21 +706,24 @@ function isSaveCampaignSequenceParams(args: unknown): args is SaveCampaignSequen
     args === null ||
     !('campaign_id' in args) ||
     typeof (args as { campaign_id: unknown }).campaign_id !== 'number' ||
-    !('sequence' in args) ||
-    !Array.isArray((args as { sequence: unknown }).sequence)
+    !('sequences' in args) ||
+    !Array.isArray((args as { sequences: unknown }).sequences)
   ) {
     return false;
   }
 
-  const sequence = (args as { sequence: unknown[] }).sequence;
-  return sequence.every(
+  const sequences = (args as { sequences: unknown[] }).sequences;
+  return sequences.every(
     (item) =>
       typeof item === 'object' &&
       item !== null &&
-      'subject' in item &&
-      typeof (item as { subject: unknown }).subject === 'string' &&
-      'body' in item &&
-      typeof (item as { body: unknown }).body === 'string'
+      'seq_number' in item &&
+      typeof (item as { seq_number: unknown }).seq_number === 'number' &&
+      'seq_delay_details' in item &&
+      typeof (item as { seq_delay_details: unknown }).seq_delay_details === 'object' &&
+      (item as { seq_delay_details: unknown }).seq_delay_details !== null &&
+      'delay_in_days' in (item as { seq_delay_details: any }).seq_delay_details &&
+      typeof (item as { seq_delay_details: { delay_in_days: unknown } }).seq_delay_details.delay_in_days === 'number'
   );
 }
 
@@ -664,15 +799,24 @@ function isAddLeadToCampaignParams(args: unknown): args is AddLeadToCampaignPara
     args === null ||
     !('campaign_id' in args) ||
     typeof (args as { campaign_id: unknown }).campaign_id !== 'number' ||
-    !('lead' in args) ||
-    typeof (args as { lead: unknown }).lead !== 'object' ||
-    (args as { lead: unknown }).lead === null
+    !('lead_list' in args) ||
+    !Array.isArray((args as { lead_list: unknown }).lead_list)
   ) {
     return false;
   }
 
-  const lead = (args as { lead: unknown }).lead as any;
-  return 'email' in lead && typeof lead.email === 'string';
+  const leadList = (args as { lead_list: unknown[] }).lead_list;
+  if (leadList.length === 0 || leadList.length > 100) {
+    return false;
+  }
+
+  return leadList.every(
+    (lead) =>
+      typeof lead === 'object' &&
+      lead !== null &&
+      'email' in lead &&
+      typeof (lead as { email: unknown }).email === 'string'
+  );
 }
 
 function isUpdateLeadInCampaignParams(args: unknown): args is UpdateLeadInCampaignParams {
@@ -1040,11 +1184,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           );
         }
 
-        const { campaign_id, sequence } = args;
+        const { campaign_id, sequences } = args;
 
         try {
+          // Log the request for debugging
+          safeLog(
+            'info',
+            `Sending request to /campaigns/${campaign_id}/sequences with payload: ${JSON.stringify({ sequences })}`
+          );
+
           const response = await withRetry(
-            async () => apiClient.post(`/campaigns/${campaign_id}/sequence`, { sequence }),
+            async () => apiClient.post(`/campaigns/${campaign_id}/sequences`, { sequences }),
             'save campaign sequence'
           );
 
@@ -1058,6 +1208,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             isError: false,
           };
         } catch (error) {
+          // Log the detailed error for debugging
+          safeLog(
+            'error',
+            `Error in smartlead_save_campaign_sequence: ${
+              axios.isAxiosError(error)
+                ? `Status: ${error.response?.status}, Data: ${JSON.stringify(error.response?.data)}`
+                : error instanceof Error ? error.message : String(error)
+            }`
+          );
+
           const errorMessage = axios.isAxiosError(error)
             ? `API Error: ${error.response?.data?.message || error.message}`
             : `Error: ${error instanceof Error ? error.message : String(error)}`;
@@ -1296,11 +1456,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
 
         try {
+          const { campaign_id, lead_list, settings } = args;
+          const payload: Record<string, any> = { lead_list };
+          
+          if (settings) {
+            payload.settings = settings;
+          }
+
           const response = await withRetry(
-            async () => apiClient.post(`/campaigns/${args.campaign_id}/leads`, {
-              leads: [args.lead],
-            }),
-            'add lead to campaign'
+            async () => apiClient.post(`/campaigns/${campaign_id}/leads`, payload),
+            'add leads to campaign'
           );
 
           return {
