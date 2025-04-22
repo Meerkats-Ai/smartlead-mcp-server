@@ -15,6 +15,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Tool definitions
+// Campaign management tools
 const CREATE_CAMPAIGN_TOOL: Tool = {
   name: 'smartlead_create_campaign',
   description: 'Create a new campaign in Smartlead.',
@@ -144,6 +145,7 @@ const LIST_CAMPAIGNS_TOOL: Tool = {
   },
 };
 
+// Campaign sequence tools
 const SAVE_CAMPAIGN_SEQUENCE_TOOL: Tool = {
   name: 'smartlead_save_campaign_sequence',
   description: 'Save a sequence of emails for a campaign.',
@@ -181,7 +183,242 @@ const SAVE_CAMPAIGN_SEQUENCE_TOOL: Tool = {
   },
 };
 
+const GET_CAMPAIGN_SEQUENCE_TOOL: Tool = {
+  name: 'smartlead_get_campaign_sequence',
+  description: 'Get the sequence of emails for a campaign.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      campaign_id: {
+        type: 'number',
+        description: 'ID of the campaign',
+      },
+    },
+    required: ['campaign_id'],
+  },
+};
+
+const UPDATE_CAMPAIGN_SEQUENCE_TOOL: Tool = {
+  name: 'smartlead_update_campaign_sequence',
+  description: 'Update a specific email in a campaign sequence.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      campaign_id: {
+        type: 'number',
+        description: 'ID of the campaign',
+      },
+      sequence_id: {
+        type: 'number',
+        description: 'ID of the sequence email to update',
+      },
+      subject: {
+        type: 'string',
+        description: 'Updated email subject line',
+      },
+      body: {
+        type: 'string',
+        description: 'Updated email body content',
+      },
+      wait_days: {
+        type: 'number',
+        description: 'Updated days to wait before sending this email',
+      },
+    },
+    required: ['campaign_id', 'sequence_id'],
+  },
+};
+
+const DELETE_CAMPAIGN_SEQUENCE_TOOL: Tool = {
+  name: 'smartlead_delete_campaign_sequence',
+  description: 'Delete a specific email from a campaign sequence.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      campaign_id: {
+        type: 'number',
+        description: 'ID of the campaign',
+      },
+      sequence_id: {
+        type: 'number',
+        description: 'ID of the sequence email to delete',
+      },
+    },
+    required: ['campaign_id', 'sequence_id'],
+  },
+};
+
+// Email account management tools
+const ADD_EMAIL_ACCOUNT_TO_CAMPAIGN_TOOL: Tool = {
+  name: 'smartlead_add_email_account_to_campaign',
+  description: 'Add an email account to a campaign.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      campaign_id: {
+        type: 'number',
+        description: 'ID of the campaign',
+      },
+      email_account_id: {
+        type: 'number',
+        description: 'ID of the email account to add',
+      },
+    },
+    required: ['campaign_id', 'email_account_id'],
+  },
+};
+
+const UPDATE_EMAIL_ACCOUNT_IN_CAMPAIGN_TOOL: Tool = {
+  name: 'smartlead_update_email_account_in_campaign',
+  description: 'Update an email account in a campaign.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      campaign_id: {
+        type: 'number',
+        description: 'ID of the campaign',
+      },
+      email_account_id: {
+        type: 'number',
+        description: 'ID of the email account to update',
+      },
+      settings: {
+        type: 'object',
+        description: 'Settings for the email account in this campaign',
+      },
+    },
+    required: ['campaign_id', 'email_account_id'],
+  },
+};
+
+const DELETE_EMAIL_ACCOUNT_FROM_CAMPAIGN_TOOL: Tool = {
+  name: 'smartlead_delete_email_account_from_campaign',
+  description: 'Remove an email account from a campaign.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      campaign_id: {
+        type: 'number',
+        description: 'ID of the campaign',
+      },
+      email_account_id: {
+        type: 'number',
+        description: 'ID of the email account to remove',
+      },
+    },
+    required: ['campaign_id', 'email_account_id'],
+  },
+};
+
+// Lead management tools
+const ADD_LEAD_TO_CAMPAIGN_TOOL: Tool = {
+  name: 'smartlead_add_lead_to_campaign',
+  description: 'Add a lead to a campaign.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      campaign_id: {
+        type: 'number',
+        description: 'ID of the campaign',
+      },
+      lead: {
+        type: 'object',
+        properties: {
+          email: {
+            type: 'string',
+            description: 'Email address of the lead',
+          },
+          first_name: {
+            type: 'string',
+            description: 'First name of the lead',
+          },
+          last_name: {
+            type: 'string',
+            description: 'Last name of the lead',
+          },
+          company: {
+            type: 'string',
+            description: 'Company of the lead',
+          },
+          custom_variables: {
+            type: 'object',
+            description: 'Custom variables for the lead',
+          },
+        },
+        required: ['email'],
+        description: 'Lead information',
+      },
+    },
+    required: ['campaign_id', 'lead'],
+  },
+};
+
+const UPDATE_LEAD_IN_CAMPAIGN_TOOL: Tool = {
+  name: 'smartlead_update_lead_in_campaign',
+  description: 'Update a lead in a campaign.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      campaign_id: {
+        type: 'number',
+        description: 'ID of the campaign',
+      },
+      lead_id: {
+        type: 'number',
+        description: 'ID of the lead to update',
+      },
+      lead: {
+        type: 'object',
+        properties: {
+          email: {
+            type: 'string',
+            description: 'Email address of the lead',
+          },
+          first_name: {
+            type: 'string',
+            description: 'First name of the lead',
+          },
+          last_name: {
+            type: 'string',
+            description: 'Last name of the lead',
+          },
+          company: {
+            type: 'string',
+            description: 'Company of the lead',
+          },
+          custom_variables: {
+            type: 'object',
+            description: 'Custom variables for the lead',
+          },
+        },
+        description: 'Updated lead information',
+      },
+    },
+    required: ['campaign_id', 'lead_id', 'lead'],
+  },
+};
+
+const DELETE_LEAD_FROM_CAMPAIGN_TOOL: Tool = {
+  name: 'smartlead_delete_lead_from_campaign',
+  description: 'Remove a lead from a campaign.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      campaign_id: {
+        type: 'number',
+        description: 'ID of the campaign',
+      },
+      lead_id: {
+        type: 'number',
+        description: 'ID of the lead to remove',
+      },
+    },
+    required: ['campaign_id', 'lead_id'],
+  },
+};
+
 // Type definitions
+// Campaign management types
 interface CreateCampaignParams {
   name: string;
   client_id?: number;
@@ -215,6 +452,7 @@ interface ListCampaignsParams {
   offset?: number;
 }
 
+// Campaign sequence types
 interface SaveCampaignSequenceParams {
   campaign_id: number;
   sequence: Array<{
@@ -224,7 +462,71 @@ interface SaveCampaignSequenceParams {
   }>;
 }
 
+interface GetCampaignSequenceParams {
+  campaign_id: number;
+}
+
+interface UpdateCampaignSequenceParams {
+  campaign_id: number;
+  sequence_id: number;
+  subject?: string;
+  body?: string;
+  wait_days?: number;
+}
+
+interface DeleteCampaignSequenceParams {
+  campaign_id: number;
+  sequence_id: number;
+}
+
+// Email account management types
+interface AddEmailAccountToCampaignParams {
+  campaign_id: number;
+  email_account_id: number;
+}
+
+interface UpdateEmailAccountInCampaignParams {
+  campaign_id: number;
+  email_account_id: number;
+  settings?: Record<string, any>;
+}
+
+interface DeleteEmailAccountFromCampaignParams {
+  campaign_id: number;
+  email_account_id: number;
+}
+
+// Lead management types
+interface AddLeadToCampaignParams {
+  campaign_id: number;
+  lead: {
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    company?: string;
+    custom_variables?: Record<string, any>;
+  };
+}
+
+interface UpdateLeadInCampaignParams {
+  campaign_id: number;
+  lead_id: number;
+  lead: {
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    company?: string;
+    custom_variables?: Record<string, any>;
+  };
+}
+
+interface DeleteLeadFromCampaignParams {
+  campaign_id: number;
+  lead_id: number;
+}
+
 // Type guards
+// Campaign management type guards
 function isCreateCampaignParams(args: unknown): args is CreateCampaignParams {
   return (
     typeof args === 'object' &&
@@ -265,6 +567,7 @@ function isListCampaignsParams(args: unknown): args is ListCampaignsParams {
   return typeof args === 'object' && args !== null;
 }
 
+// Campaign sequence type guards
 function isSaveCampaignSequenceParams(args: unknown): args is SaveCampaignSequenceParams {
   if (
     typeof args !== 'object' ||
@@ -286,6 +589,114 @@ function isSaveCampaignSequenceParams(args: unknown): args is SaveCampaignSequen
       typeof (item as { subject: unknown }).subject === 'string' &&
       'body' in item &&
       typeof (item as { body: unknown }).body === 'string'
+  );
+}
+
+function isGetCampaignSequenceParams(args: unknown): args is GetCampaignSequenceParams {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'campaign_id' in args &&
+    typeof (args as { campaign_id: unknown }).campaign_id === 'number'
+  );
+}
+
+function isUpdateCampaignSequenceParams(args: unknown): args is UpdateCampaignSequenceParams {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'campaign_id' in args &&
+    typeof (args as { campaign_id: unknown }).campaign_id === 'number' &&
+    'sequence_id' in args &&
+    typeof (args as { sequence_id: unknown }).sequence_id === 'number'
+  );
+}
+
+function isDeleteCampaignSequenceParams(args: unknown): args is DeleteCampaignSequenceParams {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'campaign_id' in args &&
+    typeof (args as { campaign_id: unknown }).campaign_id === 'number' &&
+    'sequence_id' in args &&
+    typeof (args as { sequence_id: unknown }).sequence_id === 'number'
+  );
+}
+
+// Email account management type guards
+function isAddEmailAccountToCampaignParams(args: unknown): args is AddEmailAccountToCampaignParams {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'campaign_id' in args &&
+    typeof (args as { campaign_id: unknown }).campaign_id === 'number' &&
+    'email_account_id' in args &&
+    typeof (args as { email_account_id: unknown }).email_account_id === 'number'
+  );
+}
+
+function isUpdateEmailAccountInCampaignParams(args: unknown): args is UpdateEmailAccountInCampaignParams {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'campaign_id' in args &&
+    typeof (args as { campaign_id: unknown }).campaign_id === 'number' &&
+    'email_account_id' in args &&
+    typeof (args as { email_account_id: unknown }).email_account_id === 'number'
+  );
+}
+
+function isDeleteEmailAccountFromCampaignParams(args: unknown): args is DeleteEmailAccountFromCampaignParams {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'campaign_id' in args &&
+    typeof (args as { campaign_id: unknown }).campaign_id === 'number' &&
+    'email_account_id' in args &&
+    typeof (args as { email_account_id: unknown }).email_account_id === 'number'
+  );
+}
+
+// Lead management type guards
+function isAddLeadToCampaignParams(args: unknown): args is AddLeadToCampaignParams {
+  if (
+    typeof args !== 'object' ||
+    args === null ||
+    !('campaign_id' in args) ||
+    typeof (args as { campaign_id: unknown }).campaign_id !== 'number' ||
+    !('lead' in args) ||
+    typeof (args as { lead: unknown }).lead !== 'object' ||
+    (args as { lead: unknown }).lead === null
+  ) {
+    return false;
+  }
+
+  const lead = (args as { lead: unknown }).lead as any;
+  return 'email' in lead && typeof lead.email === 'string';
+}
+
+function isUpdateLeadInCampaignParams(args: unknown): args is UpdateLeadInCampaignParams {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'campaign_id' in args &&
+    typeof (args as { campaign_id: unknown }).campaign_id === 'number' &&
+    'lead_id' in args &&
+    typeof (args as { lead_id: unknown }).lead_id === 'number' &&
+    'lead' in args &&
+    typeof (args as { lead: unknown }).lead === 'object' &&
+    (args as { lead: unknown }).lead !== null
+  );
+}
+
+function isDeleteLeadFromCampaignParams(args: unknown): args is DeleteLeadFromCampaignParams {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'campaign_id' in args &&
+    typeof (args as { campaign_id: unknown }).campaign_id === 'number' &&
+    'lead_id' in args &&
+    typeof (args as { lead_id: unknown }).lead_id === 'number'
   );
 }
 
@@ -400,12 +811,28 @@ async function withRetry<T>(
 // Tool handlers
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
+    // Campaign management tools
     CREATE_CAMPAIGN_TOOL,
     UPDATE_CAMPAIGN_SCHEDULE_TOOL,
     UPDATE_CAMPAIGN_SETTINGS_TOOL,
     GET_CAMPAIGN_TOOL,
     LIST_CAMPAIGNS_TOOL,
+    
+    // Campaign sequence tools
     SAVE_CAMPAIGN_SEQUENCE_TOOL,
+    GET_CAMPAIGN_SEQUENCE_TOOL,
+    UPDATE_CAMPAIGN_SEQUENCE_TOOL,
+    DELETE_CAMPAIGN_SEQUENCE_TOOL,
+    
+    // Email account management tools
+    ADD_EMAIL_ACCOUNT_TO_CAMPAIGN_TOOL,
+    UPDATE_EMAIL_ACCOUNT_IN_CAMPAIGN_TOOL,
+    DELETE_EMAIL_ACCOUNT_FROM_CAMPAIGN_TOOL,
+    
+    // Lead management tools
+    ADD_LEAD_TO_CAMPAIGN_TOOL,
+    UPDATE_LEAD_IN_CAMPAIGN_TOOL,
+    DELETE_LEAD_FROM_CAMPAIGN_TOOL,
   ],
 }));
 
@@ -604,6 +1031,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
       }
 
+      // Campaign sequence handlers
       case 'smartlead_save_campaign_sequence': {
         if (!isSaveCampaignSequenceParams(args)) {
           throw new McpError(
@@ -618,6 +1046,333 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           const response = await withRetry(
             async () => apiClient.post(`/campaigns/${campaign_id}/sequence`, { sequence }),
             'save campaign sequence'
+          );
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+            isError: false,
+          };
+        } catch (error) {
+          const errorMessage = axios.isAxiosError(error)
+            ? `API Error: ${error.response?.data?.message || error.message}`
+            : `Error: ${error instanceof Error ? error.message : String(error)}`;
+
+          return {
+            content: [{ type: 'text', text: errorMessage }],
+            isError: true,
+          };
+        }
+      }
+
+      case 'smartlead_get_campaign_sequence': {
+        if (!isGetCampaignSequenceParams(args)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Invalid arguments for smartlead_get_campaign_sequence'
+          );
+        }
+
+        try {
+          const response = await withRetry(
+            async () => apiClient.get(`/campaigns/${args.campaign_id}/sequence`),
+            'get campaign sequence'
+          );
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+            isError: false,
+          };
+        } catch (error) {
+          const errorMessage = axios.isAxiosError(error)
+            ? `API Error: ${error.response?.data?.message || error.message}`
+            : `Error: ${error instanceof Error ? error.message : String(error)}`;
+
+          return {
+            content: [{ type: 'text', text: errorMessage }],
+            isError: true,
+          };
+        }
+      }
+
+      case 'smartlead_update_campaign_sequence': {
+        if (!isUpdateCampaignSequenceParams(args)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Invalid arguments for smartlead_update_campaign_sequence'
+          );
+        }
+
+        const { campaign_id, sequence_id, ...updateParams } = args;
+
+        try {
+          const response = await withRetry(
+            async () => apiClient.patch(`/campaigns/${campaign_id}/sequence/${sequence_id}`, updateParams),
+            'update campaign sequence'
+          );
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+            isError: false,
+          };
+        } catch (error) {
+          const errorMessage = axios.isAxiosError(error)
+            ? `API Error: ${error.response?.data?.message || error.message}`
+            : `Error: ${error instanceof Error ? error.message : String(error)}`;
+
+          return {
+            content: [{ type: 'text', text: errorMessage }],
+            isError: true,
+          };
+        }
+      }
+
+      case 'smartlead_delete_campaign_sequence': {
+        if (!isDeleteCampaignSequenceParams(args)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Invalid arguments for smartlead_delete_campaign_sequence'
+          );
+        }
+
+        try {
+          const response = await withRetry(
+            async () => apiClient.delete(`/campaigns/${args.campaign_id}/sequence/${args.sequence_id}`),
+            'delete campaign sequence'
+          );
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+            isError: false,
+          };
+        } catch (error) {
+          const errorMessage = axios.isAxiosError(error)
+            ? `API Error: ${error.response?.data?.message || error.message}`
+            : `Error: ${error instanceof Error ? error.message : String(error)}`;
+
+          return {
+            content: [{ type: 'text', text: errorMessage }],
+            isError: true,
+          };
+        }
+      }
+
+      // Email account management handlers
+      case 'smartlead_add_email_account_to_campaign': {
+        if (!isAddEmailAccountToCampaignParams(args)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Invalid arguments for smartlead_add_email_account_to_campaign'
+          );
+        }
+
+        try {
+          const response = await withRetry(
+            async () => apiClient.post(`/campaigns/${args.campaign_id}/email-accounts`, {
+              email_account_id: args.email_account_id,
+            }),
+            'add email account to campaign'
+          );
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+            isError: false,
+          };
+        } catch (error) {
+          const errorMessage = axios.isAxiosError(error)
+            ? `API Error: ${error.response?.data?.message || error.message}`
+            : `Error: ${error instanceof Error ? error.message : String(error)}`;
+
+          return {
+            content: [{ type: 'text', text: errorMessage }],
+            isError: true,
+          };
+        }
+      }
+
+      case 'smartlead_update_email_account_in_campaign': {
+        if (!isUpdateEmailAccountInCampaignParams(args)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Invalid arguments for smartlead_update_email_account_in_campaign'
+          );
+        }
+
+        const { campaign_id, email_account_id, settings } = args;
+
+        try {
+          const response = await withRetry(
+            async () => apiClient.patch(`/campaigns/${campaign_id}/email-accounts/${email_account_id}`, settings || {}),
+            'update email account in campaign'
+          );
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+            isError: false,
+          };
+        } catch (error) {
+          const errorMessage = axios.isAxiosError(error)
+            ? `API Error: ${error.response?.data?.message || error.message}`
+            : `Error: ${error instanceof Error ? error.message : String(error)}`;
+
+          return {
+            content: [{ type: 'text', text: errorMessage }],
+            isError: true,
+          };
+        }
+      }
+
+      case 'smartlead_delete_email_account_from_campaign': {
+        if (!isDeleteEmailAccountFromCampaignParams(args)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Invalid arguments for smartlead_delete_email_account_from_campaign'
+          );
+        }
+
+        try {
+          const response = await withRetry(
+            async () => apiClient.delete(`/campaigns/${args.campaign_id}/email-accounts/${args.email_account_id}`),
+            'delete email account from campaign'
+          );
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+            isError: false,
+          };
+        } catch (error) {
+          const errorMessage = axios.isAxiosError(error)
+            ? `API Error: ${error.response?.data?.message || error.message}`
+            : `Error: ${error instanceof Error ? error.message : String(error)}`;
+
+          return {
+            content: [{ type: 'text', text: errorMessage }],
+            isError: true,
+          };
+        }
+      }
+
+      // Lead management handlers
+      case 'smartlead_add_lead_to_campaign': {
+        if (!isAddLeadToCampaignParams(args)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Invalid arguments for smartlead_add_lead_to_campaign'
+          );
+        }
+
+        try {
+          const response = await withRetry(
+            async () => apiClient.post(`/campaigns/${args.campaign_id}/leads`, {
+              leads: [args.lead],
+            }),
+            'add lead to campaign'
+          );
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+            isError: false,
+          };
+        } catch (error) {
+          const errorMessage = axios.isAxiosError(error)
+            ? `API Error: ${error.response?.data?.message || error.message}`
+            : `Error: ${error instanceof Error ? error.message : String(error)}`;
+
+          return {
+            content: [{ type: 'text', text: errorMessage }],
+            isError: true,
+          };
+        }
+      }
+
+      case 'smartlead_update_lead_in_campaign': {
+        if (!isUpdateLeadInCampaignParams(args)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Invalid arguments for smartlead_update_lead_in_campaign'
+          );
+        }
+
+        const { campaign_id, lead_id, lead } = args;
+
+        try {
+          const response = await withRetry(
+            async () => apiClient.patch(`/campaigns/${campaign_id}/leads/${lead_id}`, lead),
+            'update lead in campaign'
+          );
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(response.data, null, 2),
+              },
+            ],
+            isError: false,
+          };
+        } catch (error) {
+          const errorMessage = axios.isAxiosError(error)
+            ? `API Error: ${error.response?.data?.message || error.message}`
+            : `Error: ${error instanceof Error ? error.message : String(error)}`;
+
+          return {
+            content: [{ type: 'text', text: errorMessage }],
+            isError: true,
+          };
+        }
+      }
+
+      case 'smartlead_delete_lead_from_campaign': {
+        if (!isDeleteLeadFromCampaignParams(args)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Invalid arguments for smartlead_delete_lead_from_campaign'
+          );
+        }
+
+        try {
+          const response = await withRetry(
+            async () => apiClient.delete(`/campaigns/${args.campaign_id}/leads/${args.lead_id}`),
+            'delete lead from campaign'
           );
 
           return {

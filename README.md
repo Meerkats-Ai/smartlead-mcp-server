@@ -9,7 +9,9 @@ This is a Model Context Protocol (MCP) server for Smartlead campaign management 
 - Update campaign general settings
 - Get campaign details
 - List all campaigns with filtering options
-- Save campaign email sequences
+- Manage campaign email sequences (save, get, update, delete)
+- Manage email accounts in campaigns (add, update, delete)
+- Manage leads in campaigns (add, update, delete)
 
 ## Installation
 
@@ -140,6 +142,92 @@ Save a sequence of emails for a campaign.
   - `subject` (required): Email subject line
   - `body` (required): Email body content
   - `wait_days`: Days to wait before sending this email
+
+### smartlead_get_campaign_sequence
+
+Get the sequence of emails for a campaign.
+
+**Parameters:**
+- `campaign_id` (required): ID of the campaign
+
+### smartlead_update_campaign_sequence
+
+Update a specific email in a campaign sequence.
+
+**Parameters:**
+- `campaign_id` (required): ID of the campaign
+- `sequence_id` (required): ID of the sequence email to update
+- `subject`: Updated email subject line
+- `body`: Updated email body content
+- `wait_days`: Updated days to wait before sending this email
+
+### smartlead_delete_campaign_sequence
+
+Delete a specific email from a campaign sequence.
+
+**Parameters:**
+- `campaign_id` (required): ID of the campaign
+- `sequence_id` (required): ID of the sequence email to delete
+
+### smartlead_add_email_account_to_campaign
+
+Add an email account to a campaign.
+
+**Parameters:**
+- `campaign_id` (required): ID of the campaign
+- `email_account_id` (required): ID of the email account to add
+
+### smartlead_update_email_account_in_campaign
+
+Update an email account in a campaign.
+
+**Parameters:**
+- `campaign_id` (required): ID of the campaign
+- `email_account_id` (required): ID of the email account to update
+- `settings`: Settings for the email account in this campaign
+
+### smartlead_delete_email_account_from_campaign
+
+Remove an email account from a campaign.
+
+**Parameters:**
+- `campaign_id` (required): ID of the campaign
+- `email_account_id` (required): ID of the email account to remove
+
+### smartlead_add_lead_to_campaign
+
+Add a lead to a campaign.
+
+**Parameters:**
+- `campaign_id` (required): ID of the campaign
+- `lead` (required): Lead information with:
+  - `email` (required): Email address of the lead
+  - `first_name`: First name of the lead
+  - `last_name`: Last name of the lead
+  - `company`: Company of the lead
+  - `custom_variables`: Custom variables for the lead
+
+### smartlead_update_lead_in_campaign
+
+Update a lead in a campaign.
+
+**Parameters:**
+- `campaign_id` (required): ID of the campaign
+- `lead_id` (required): ID of the lead to update
+- `lead` (required): Updated lead information with:
+  - `email`: Email address of the lead
+  - `first_name`: First name of the lead
+  - `last_name`: Last name of the lead
+  - `company`: Company of the lead
+  - `custom_variables`: Custom variables for the lead
+
+### smartlead_delete_lead_from_campaign
+
+Remove a lead from a campaign.
+
+**Parameters:**
+- `campaign_id` (required): ID of the campaign
+- `lead_id` (required): ID of the lead to remove
 
 ## License
 
