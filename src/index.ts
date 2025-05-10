@@ -1011,10 +1011,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       'info',
       `[${new Date().toISOString()}] Received request for tool: ${name}`
     );
-    safeLog(
-      'info',
-      JSON.stringify(request.params, null, 2)
-    );
 
     if (!args) {
       throw new Error('No arguments provided');
