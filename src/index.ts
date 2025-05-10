@@ -417,7 +417,21 @@ const ADD_LEAD_TO_CAMPAIGN_TOOL: Tool = {
             },
             custom_fields: {
               type: 'object',
-              description: 'Custom fields for the lead (max 20 fields)',
+              properties: {
+                email1: {
+                  type: 'string',
+                  description: 'Value of the custom field',
+                },
+                email2: {
+                  type: 'string',
+                  description: 'Value of the custom field',
+                },
+                email3: {
+                  type: 'string',
+                  description: 'Value of the custom field',
+                }
+              },
+              required: [],
             },
             linkedin_profile: {
               type: 'string',
@@ -495,7 +509,11 @@ const UPDATE_LEAD_IN_CAMPAIGN_TOOL: Tool = {
           },
           custom_variables: {
             type: 'object',
-            description: 'Custom variables for the lead',
+            description: `Custom fields for the lead (max 20 fields) like
+              "custom_fields": {
+    "email1": "Value 1",
+    "email2": "51-200"
+  } `,
           },
         },
         description: 'Updated lead information',
@@ -628,7 +646,10 @@ interface AddLeadToCampaignParams {
     phone_number?: string | number;
     website?: string;
     location?: string;
-    custom_fields?: Record<string, any>;
+    custom_fields: {
+      eamil1: string;
+      email2: string;
+    };
     linkedin_profile?: string;
     company_url?: string;
   }>;
@@ -935,7 +956,7 @@ async function withRetry<T>(
     if (isRateLimit && attempt < CONFIG.retry.maxAttempts) {
       const delayMs = Math.min(
         CONFIG.retry.initialDelay *
-          Math.pow(CONFIG.retry.backoffFactor, attempt - 1),
+        Math.pow(CONFIG.retry.backoffFactor, attempt - 1),
         CONFIG.retry.maxDelay
       );
 
@@ -961,18 +982,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     UPDATE_CAMPAIGN_SETTINGS_TOOL,
     GET_CAMPAIGN_TOOL,
     LIST_CAMPAIGNS_TOOL,
-    
+
     // Campaign sequence tools
     SAVE_CAMPAIGN_SEQUENCE_TOOL,
     GET_CAMPAIGN_SEQUENCE_TOOL,
     UPDATE_CAMPAIGN_SEQUENCE_TOOL,
     DELETE_CAMPAIGN_SEQUENCE_TOOL,
-    
+
     // Email account management tools
     ADD_EMAIL_ACCOUNT_TO_CAMPAIGN_TOOL,
     UPDATE_EMAIL_ACCOUNT_IN_CAMPAIGN_TOOL,
     DELETE_EMAIL_ACCOUNT_FROM_CAMPAIGN_TOOL,
-    
+
     // Lead management tools
     ADD_LEAD_TO_CAMPAIGN_TOOL,
     UPDATE_LEAD_IN_CAMPAIGN_TOOL,
@@ -989,6 +1010,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     safeLog(
       'info',
       `[${new Date().toISOString()}] Received request for tool: ${name}`
+    );
+    safeLog(
+      'info',
+      JSON.stringify(request.params, null, 2)
     );
 
     if (!args) {
@@ -1009,7 +1034,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             async () => apiClient.post('/campaigns/create', args),
             'create campaign'
           );
-
+          safeLog(
+            'info',
+            JSON.stringify(response.data, null, 2)
+          );
           return {
             content: [
               {
@@ -1020,6 +1048,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             isError: false,
           };
         } catch (error) {
+          safeLog(
+            'info',
+            JSON.stringify(error, null, 2)
+          );
           const errorMessage = axios.isAxiosError(error)
             ? `API Error: ${error.response?.data?.message || error.message}`
             : `Error: ${error instanceof Error ? error.message : String(error)}`;
@@ -1211,10 +1243,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           // Log the detailed error for debugging
           safeLog(
             'error',
-            `Error in smartlead_save_campaign_sequence: ${
-              axios.isAxiosError(error)
-                ? `Status: ${error.response?.status}, Data: ${JSON.stringify(error.response?.data)}`
-                : error instanceof Error ? error.message : String(error)
+            `Error in smartlead_save_campaign_sequence: ${axios.isAxiosError(error)
+              ? `Status: ${error.response?.status}, Data: ${JSON.stringify(error.response?.data)}`
+              : error instanceof Error ? error.message : String(error)
             }`
           );
 
@@ -1458,7 +1489,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         try {
           const { campaign_id, lead_list, settings } = args;
           const payload: Record<string, any> = { lead_list };
-          
+
           if (settings) {
             payload.settings = settings;
           }
@@ -1572,9 +1603,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   } catch (error) {
     // Log detailed error information
     safeLog('error', {
-      message: `Request failed: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+      message: `Request failed: ${error instanceof Error ? error.message : String(error)
+        }`,
       tool: request.params.name,
       arguments: request.params.arguments,
       timestamp: new Date().toISOString(),
